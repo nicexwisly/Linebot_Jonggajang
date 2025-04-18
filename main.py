@@ -44,7 +44,7 @@ def callback():
 def upload_mm():
     global json_data
     try:
-        json_data = request.get_json()
+        json_data_mm = request.get_json()
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
