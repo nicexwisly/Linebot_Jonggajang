@@ -41,11 +41,10 @@ def callback():
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/upload-mm", methods=["POST"])
-def upload_mm_json():
-    global json_data_mm
+def upload_mm():
+    global json_data
     try:
-        json_data_mm = request.get_json()
-        print(f"✅ ได้รับข้อมูล MM JSON แล้ว: {len(json_data_mm)} รายการ")
+        json_data = request.get_json()
         return jsonify({"status": "success"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
