@@ -42,11 +42,13 @@ def callback():
 
 @app.route("/api/upload-mm", methods=["POST"])
 def upload_mm():
-    global json_data
+    global json_data_mm
     try:
         json_data_mm = request.get_json()
-        return jsonify({"status": "success"})
+        print(f"✅ อัปโหลดสำเร็จ: {len(json_data_mm)} records")
+        return jsonify({"status": "success", "records": len(json_data_mm)}), 200
     except Exception as e:
+        print(f"❌ ERROR in upload_mm(): {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 def search_mm(keyword):
