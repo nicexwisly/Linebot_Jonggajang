@@ -28,18 +28,6 @@ def upload_mm():
     global json_data_mm
     try:
         json_data_mm = request.get_json()
-        print("✅ ข้อมูลที่ได้รับ:", json_data_mm)  # เพิ่มบรรทัดนี้
-        return jsonify({"status": "success"})
-    except Exception as e:
-        print("❌ เกิดข้อผิดพลาดใน /api/upload-mm")
-        traceback.print_exc()  # แสดง stacktrace ที่ทำให้ error
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route("/api/upload-mm", methods=["POST"])
-def upload_mm():
-    global json_data_mm
-    try:
-        json_data_mm = request.get_json()
         print(f"✅ อัปโหลดสำเร็จ: {len(json_data_mm)} records")
         return jsonify({"status": "success", "records": len(json_data_mm)}), 200
     except Exception as e:
