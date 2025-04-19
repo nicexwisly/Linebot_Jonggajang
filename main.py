@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import pandas as pd
 import os
 import requests
+import traceback
 
 app = Flask(__name__)
 
@@ -22,23 +23,17 @@ def reply_to_line(reply_token, message):
     }
     requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=body)
 
-@app.route("/callback", methods=["POST"])
-def callback():
-    body = request.json
+@app.route("/api/upload-mm", methods=["POST"])
+def upload_mm():
+    global json_data_mm
     try:
-        events = body.get("events", [])
-        for event in events:
-            if event.get("type") == "message" and event["message"]["type"] == "text":
-                user_msg = event["message"]["text"]
-                reply_token = event["replyToken"]
-
-                if user_msg.startswith("@@mm"):
-                    keyword = user_msg.replace("@@mm", "").strip()
-                    answer = search_mm(keyword)
-                    reply_to_line(reply_token, answer)
-        return jsonify({"status": "ok"}), 200
+        json_data_mm = request.get_json()
+        print("✅ ข้อมูลที่ได้รับ:", json_data_mm)  # เพิ่มบรรทัดนี้
+        return jsonify({"status": "success"})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print("❌ เกิดข้อผิดพลาดใน /api/upload-mm")
+        traceback.print_exc()  # แสดง stacktrace ที่ทำให้ error
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/api/upload-mm", methods=["POST"])
 def upload_mm():
