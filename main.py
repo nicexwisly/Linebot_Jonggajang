@@ -59,19 +59,21 @@ def search_product(keyword):
 
                 lines = []
                 for i in range(len(dates)):
+                    try:
+                        date_obj = datetime.strptime(dates[i], "%Y-%m-%d")
+                        short_date = f"{date_obj.day}/{date_obj.month}/{str(date_obj.year)[-2:]}"
+                    except:
+                        short_date = dates[i]
                     line = (
-                        f"Date: {dates[i]} | "
-                        f"Dept: {depts[i]} | "
-                        f"Class: {classes[i]} | "
-                        f"Receipts: {receipts[i]} | "
-                        f"InvAdjust: {invs[i]} | "
-                        f"SOH: {eoys[i]} | "
-                        f"SHK: {shrinks[i]} | "
-                        f"Sales: {sales[i]}"
+                        f" {short_date} | "
+                        f" {sales[i]} | "
+                        f" {receipts[i]} | "
+                        f" {invs[i]} | "
+                        f" {eoys[i]} | "
                     )
                     lines.append(line)
 
-                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
+                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}\nDept : {row.get('dept', '')} Class : {row.get('Class', '')}"
                 return header + "\n\n" + "\n\n".join(lines)
             
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
