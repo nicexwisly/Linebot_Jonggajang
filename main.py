@@ -73,7 +73,7 @@ def search_product(keyword):
                     )
                     lines.append(line)
 
-                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}\nDept : {row.get('dept', '')} Class : {row.get('Class', '')}"
+                header = f"ไอเท็ม: {item_id}Dept : {row.get('Dept', '')} Class : {row.get('Class', '')}\nสินค้า: {row.get('สินค้า', '')}\n\n Date    |   sales  |   rec  |     Adj    |    SOH"                
                 return header + "\n\n" + "\n\n".join(lines)
             
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
