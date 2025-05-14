@@ -63,16 +63,16 @@ def search_product(keyword):
                         f"Date: {dates[i]} | "
                         f"Dept: {depts[i]} | "
                         f"Class: {classes[i]} | "
-                        f"Receipts Qty: {receipts[i]} | "
-                        f"Inv Adjust Qty: {invs[i]} | "
-                        f"EOY SOH Qty: {eoys[i]} | "
-                        f"Shrinkage Qty: {shrinks[i]} | "
-                        f"Net Sales Qty: {sales[i]}"
+                        f"Receipts: {receipts[i]} | "
+                        f"InvAdjust: {invs[i]} | "
+                        f"SOH: {eoys[i]} | "
+                        f"SHK: {shrinks[i]} | "
+                        f"Sales: {sales[i]}"
                     )
                     lines.append(line)
 
                 header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
-                return header + "\n\n" + "\n".join(lines)
+                return header + "\n\n" + "\n\n".join(lines)
             
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
                 
