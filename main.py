@@ -86,15 +86,18 @@ def search_product(keyword):
                         short_date = dates[i]
                     line = (
                         f" {short_date} | "
-                        f" {sales[i]:.1f} | "
-                        f" {receipts[i]:.1f} | "
-                        f" {invs[i]:.1f} | "
-                        f" {eoys[i]:.1f} | "
+                        f"🧾 {sales[i]:.1f} | "
+                        f"📊 {receipts[i]:.1f} | "
+                        f"🔁 {invs[i]:.1f} | "
+                        f"📦 {eoys[i]:.1f} | "
                     )
                     lines.append(line)
 
-                header = f"ไอเท็ม: {item_id}Dept : {row.get('Dept', '')} Class : {row.get('Class', '')}\nสินค้า: {row.get('สินค้า', '')}\n\n Date    |   sales  |   rec  |     Adj    |    SOH"                
-                return header + "\n\n" + "\n\n".join(lines)
+                header = (
+                    f"ไอเท็ม: {item_id} | Dept: {depts[0]} | Class: {classes[0]}\n"
+                    f"สินค้า: {row.get('สินค้า', '')}"
+                )
+                return header + "\n\n" + "\n".join(lines)
             
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
                 
