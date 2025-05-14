@@ -58,6 +58,7 @@ def search_product(keyword):
                 sales = row.get("Sales", [])
 
                 lines = []
+                lines.append("Date     | Sales | Rec  | Adj   | SOH")
                 receipts = [r if r is not None else 0 for r in receipts]        
                 invs = [v if v is not None else 0 for v in invs]
                 eoys = [s if s is not None else 0 for s in eoys]
@@ -85,11 +86,11 @@ def search_product(keyword):
                     except:
                         short_date = dates[i]
                     line = (
-                        f" {short_date} | "
-                        f"🧾 {sales[i]:.1f} | "
-                        f"📊 {receipts[i]:.1f} | "
-                        f"🔁 {invs[i]:.1f} | "
-                        f"📦 {eoys[i]:.1f} | "
+                        f"{short_date.ljust(9)}| "
+                        f"{str(round(sales[i], 1)).ljust(6)}| "
+                        f"{str(round(receipts[i], 1)).ljust(5)}| "
+                        f"{str(round(invs[i], 1)).ljust(6)}| "
+                        f"{str(round(eoys[i], 1)).ljust(5)}"
                     )
                     lines.append(line)
 
