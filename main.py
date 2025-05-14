@@ -86,10 +86,10 @@ def search_product(keyword):
                         short_date = dates[i]
                     line = (
                         f" {short_date} | "
-                        f" {sales[i]} | "
-                        f" {receipts[i]} | "
-                        f" {invs[i]} | "
-                        f" {eoys[i]} | "
+                        f" {sales[i]:.1f} | "
+                        f" {receipts[i]:.1f} | "
+                        f" {invs[i]:.1f} | "
+                        f" {eoys[i]:.1f} | "
                     )
                     lines.append(line)
 
