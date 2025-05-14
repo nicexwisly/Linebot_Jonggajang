@@ -48,21 +48,21 @@ def search_product(keyword):
         item_id = keyword.replace("mm", "").strip()
         for row in json_data:
             if str(row.get("ไอเท็ม", "")) == item_id:
-                dates = row.get("Date", [])
-                depts = row.get("Department Number", [])
-                classes = row.get("Class Number", [])
-                receipts = row.get("Receipts Qty", [])
-                invs = row.get("Inv Adjust Qty", [])
-                eoys = row.get("EOY SOH Qty", [])
-                shrinks = row.get("Shrinkage Qty", [])
-                sales = row.get("Net Sales Qty", [])
+                dates = row.get("date", [])
+                depts = row.get("Dept", [])
+                classes = row.get("Class", [])
+                receipts = row.get("Receipts", [])
+                invs = row.get("InvAdjust", [])
+                eoys = row.get("EOYSOH", [])
+                shrinks = row.get("Shrink", [])
+                sales = row.get("Sales", [])
 
                 lines = []
                 for i in range(len(dates)):
                     line = (
-                        f"{dates[i]} | "
-                        f"Department Number: {depts[i]} | "
-                        f"Class Number: {classes[i]} | "
+                        f"Date: {dates[i]} | "
+                        f"Dept: {depts[i]} | "
+                        f"Class: {classes[i]} | "
                         f"Receipts Qty: {receipts[i]} | "
                         f"Inv Adjust Qty: {invs[i]} | "
                         f"EOY SOH Qty: {eoys[i]} | "
