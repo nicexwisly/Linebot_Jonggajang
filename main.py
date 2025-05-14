@@ -73,7 +73,9 @@ def search_product(keyword):
 
                 header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
                 return header + "\n\n" + "\n".join(lines)
-            return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"    
+            
+        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
+                
 
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
