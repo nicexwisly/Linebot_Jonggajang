@@ -58,6 +58,26 @@ def search_product(keyword):
                 sales = row.get("Sales", [])
 
                 lines = []
+                receipts = [r if r is not None else 0 for r in receipts]        
+                invs = [v if v is not None else 0 for v in invs]
+                eoys = [s if s is not None else 0 for s in eoys]
+                shrinks = [s if s is not None else 0 for s in shrinks]
+                sales = [s if s is not None else 0 for s in sales]
+
+                sorted_indexes = sorted(
+                    range(len(dates)),
+                    key=lambda i: datetime.strptime(dates[i], "%Y-%m-%d"),
+                    reverse=True
+                )
+
+                dates = [dates[i] for i in sorted_indexes]
+                classes = [classes[i] for i in sorted_indexes]
+                receipts = [receipts[i] for i in sorted_indexes]
+                invs = [invs[i] for i in sorted_indexes]
+                eoys = [eoys[i] for i in sorted_indexes]
+                shrinks = [shrinks[i] for i in sorted_indexes]
+                sales = [sales[i] for i in sorted_indexes]
+                
                 for i in range(len(dates)):
                     try:
                         date_obj = datetime.strptime(dates[i], "%Y-%m-%d")
