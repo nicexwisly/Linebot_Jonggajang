@@ -58,23 +58,23 @@ def search_product(keyword):
                 sales = row.get("Sales", [])
                 dc = row.get("DC", [])
 
-            lines = []
-            for i in range(len(dates)):
-                total_receipts = (receipts[i] or 0) + (dc[i] or 0)
-                line = (
-                    f"{dates[i]} | "
-                    f"Dept: {depts[i]} | "
-                    f"Class: {classes[i]} | "
-                    f"Receipts+DC: {total_receipts} | "
-                    f"Inv Adj: {invs[i]} | "
-                    f"EOY SOH: {eoys[i]} | "
-                    f"Shrink: {shrinks[i]} | "
-                    f"Sales: {sales[i]}"
-                )
-                lines.append(line)
+                lines = []
+                for i in range(len(dates)):
+                    total_receipts = (receipts[i] or 0) + (dc[i] or 0)
+                    line = (
+                        f"{dates[i]} | "
+                        f"Dept: {depts[i]} | "
+                        f"Class: {classes[i]} | "
+                        f"Receipts+DC: {total_receipts} | "
+                        f"Inv Adj: {invs[i]} | "
+                        f"EOY SOH: {eoys[i]} | "
+                        f"Shrink: {shrinks[i]} | "
+                        f"Sales: {sales[i]}"
+                    )
+                    lines.append(line)
 
-            header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
-            return header + "\n\n" + "\n".join(lines)
+                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
+                return header + "\n\n" + "\n".join(lines)
 
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'" 
 
