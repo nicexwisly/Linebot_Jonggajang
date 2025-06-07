@@ -43,7 +43,7 @@ def search_product(keyword):
 
     is_plu_search = keyword.startswith("plu")
     search_value = keyword[3:] if is_plu_search else keyword
-
+    
     if keyword.startswith("mm"):
         item_id = keyword.replace("mm", "").strip()
         for row in json_data:
@@ -57,35 +57,36 @@ def search_product(keyword):
                 sales = row.get("Sales", [])
                 dc = row.get("DC", [])
 
-            # ปรับค่า None ให้เป็น 0
+            # แก้ None เป็น 0
                 receipts = [r if r is not None else 0 for r in receipts]
                 dc = [d if d is not None else 0 for d in dc]
                 invs = [v if v is not None else 0 for v in invs]
                 eoys = [s if s is not None else 0 for s in eoys]
                 sales = [s if s is not None else 0 for s in sales]
 
-            # เรียงวันที่จากใหม่ไปเก่า
+            # เรียงวันที่ใหม่สุด → เก่าสุด
                 sorted_indexes = sorted(
                     range(len(dates)),
                     key=lambda i: datetime.strptime(dates[i], "%Y-%m-%d"),
                     reverse=True
                 )
 
-                lines = ["Date    | Sales | Rec | Adj   | SOH"]
+                lines = ["Date | Sales | Rec | Adj | SOH"]
                 for i in sorted_indexes:
                     try:
                         d = datetime.strptime(dates[i], "%Y-%m-%d")
-                        short_date = f"{d.day}/{d.month}/{str(d.year)[-2:]}"
+                        day = d.strftime("%a")[0]  # เช่น M, T, W...
+                        short_date = f"{day} {d.day}/{d.month}"
                     except:
                         short_date = dates[i]
 
                     rec_total = receipts[i] + dc[i]
                     line = (
-                        f"{short_date.ljust(8)}| "
-                        f"{str(round(sales[i], 1)).ljust(6)}| "
-                        f"{str(round(rec_total, 1)).ljust(4)}| "
-                        f"{str(round(invs[i], 1)).ljust(6)}| "
-                        f"{str(round(eoys[i], 1)).ljust(5)}"
+                        f"{short_date.ljust(5)}| "
+                        f"{str(int(round(sales[i]))).rjust(3)} | "
+                        f"{str(int(round(rec_total))).rjust(3)} | "
+                        f"{str(int(round(invs[i]))).rjust(3)} | "
+                        f"{str(int(round(eoys[i]))).rjust(3)}"
                     )
                     lines.append(line)
 
