@@ -54,29 +54,48 @@ def search_product(keyword):
                 receipts = row.get("Receipts", [])
                 invs = row.get("InvAdjust", [])
                 eoys = row.get("EOYSOH", [])
-                shrinks = row.get("Shrink", [])
                 sales = row.get("Sales", [])
                 dc = row.get("DC", [])
 
-                lines = []
-                for i in range(len(dates)):
-                    total_receipts = (receipts[i] or 0) + (dc[i] or 0)
+            # ปรับค่า None ให้เป็น 0
+                receipts = [r if r is not None else 0 for r in receipts]
+                dc = [d if d is not None else 0 for d in dc]
+                invs = [v if v is not None else 0 for v in invs]
+                eoys = [s if s is not None else 0 for s in eoys]
+                sales = [s if s is not None else 0 for s in sales]
+
+            # เรียงวันที่จากใหม่ไปเก่า
+                sorted_indexes = sorted(
+                    range(len(dates)),
+                    key=lambda i: datetime.strptime(dates[i], "%Y-%m-%d"),
+                    reverse=True
+                )
+
+                lines = ["Date    | Sales | Rec | Adj   | SOH"]
+                for i in sorted_indexes:
+                    try:
+                        d = datetime.strptime(dates[i], "%Y-%m-%d")
+                        short_date = f"{d.day}/{d.month}/{str(d.year)[-2:]}"
+                    except:
+                        short_date = dates[i]
+
+                    rec_total = receipts[i] + dc[i]
                     line = (
-                        f"{dates[i]} | "
-                        f"Dept: {depts[i]} | "
-                        f"Class: {classes[i]} | "
-                        f"Receipts+DC: {total_receipts} | "
-                        f"Inv Adj: {invs[i]} | "
-                        f"EOY SOH: {eoys[i]} | "
-                        f"Shrink: {shrinks[i]} | "
-                        f"Sales: {sales[i]}"
+                        f"{short_date.ljust(8)}| "
+                        f"{str(round(sales[i], 1)).ljust(6)}| "
+                        f"{str(round(rec_total, 1)).ljust(4)}| "
+                        f"{str(round(invs[i], 1)).ljust(6)}| "
+                        f"{str(round(eoys[i], 1)).ljust(5)}"
                     )
                     lines.append(line)
 
-                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
+                header = (
+                    f"ไอเท็ม: {item_id} | Dept: {depts[0]} | Class: {classes[0]}\n"
+                    f"สินค้า: {row.get('สินค้า', '')}"
+                )
                 return header + "\n\n" + "\n".join(lines)
 
-        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'" 
+        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
 
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
