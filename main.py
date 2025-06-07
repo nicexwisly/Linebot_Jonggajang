@@ -48,60 +48,33 @@ def search_product(keyword):
         item_id = keyword.replace("mm", "").strip()
         for row in json_data:
             if str(row.get("ไอเท็ม", "")) == item_id:
-                dates = row.get("date", [])
-                depts = row.get("Dept", [])
-                classes = row.get("Class", [])
-                receipts = row.get("Receipts", [])
-                invs = row.get("InvAdjust", [])
-                eoys = row.get("EOYSOH", [])
-                shrinks = row.get("Shrink", [])
-                sales = row.get("Sales", [])
+                dates = row.get("Date", [])
+                depts = row.get("Department Number", [])
+                classes = row.get("Class Number", [])
+                receipts = row.get("Receipts Qty", [])
+                invs = row.get("Inv Adjust Qty", [])
+                eoys = row.get("EOY SOH Qty", [])
+                shrinks = row.get("Shrinkage Qty", [])
+                sales = row.get("Net Sales Qty", [])
+                dc = row.get("DC QTY", [])
 
                 lines = []
-                lines.append("Date     | Sales | Rec  | Adj   | SOH")
-                receipts = [r if r is not None else 0 for r in receipts]        
-                invs = [v if v is not None else 0 for v in invs]
-                eoys = [s if s is not None else 0 for s in eoys]
-                shrinks = [s if s is not None else 0 for s in shrinks]
-                sales = [s if s is not None else 0 for s in sales]
-
-                sorted_indexes = sorted(
-                    range(len(dates)),
-                    key=lambda i: datetime.strptime(dates[i], "%Y-%m-%d"),
-                    reverse=True
-                )
-
-                dates = [dates[i] for i in sorted_indexes]
-                classes = [classes[i] for i in sorted_indexes]
-                receipts = [receipts[i] for i in sorted_indexes]
-                invs = [invs[i] for i in sorted_indexes]
-                eoys = [eoys[i] for i in sorted_indexes]
-                shrinks = [shrinks[i] for i in sorted_indexes]
-                sales = [sales[i] for i in sorted_indexes]
-                
                 for i in range(len(dates)):
-                    try:
-                        date_obj = datetime.strptime(dates[i], "%Y-%m-%d")
-                        short_date = f"{date_obj.day}/{date_obj.month}/{str(date_obj.year)[-2:]}"
-                    except:
-                        short_date = dates[i]
                     line = (
-                        f"{short_date.ljust(9)}| "
-                        f"{str(round(sales[i], 1)).ljust(6)}| "
-                        f"{str(round(receipts[i], 1)).ljust(5)}| "
-                        f"{str(round(invs[i], 1)).ljust(6)}| "
-                        f"{str(round(eoys[i], 1)).ljust(5)}"
+                        f"{dates[i]} | "
+                        f"Department Number: {depts[i]} | "
+                        f"Class Number: {classes[i]} | "
+                        f"Receipts Qty: {receipts[i]+dc[i]} | "
+                        f"Inv Adjust Qty: {invs[i]} | "
+                        f"EOY SOH Qty: {eoys[i]} | "
+                        f"Shrinkage Qty: {shrinks[i]} | "
+                        f"Net Sales Qty: {sales[i]}"
                     )
                     lines.append(line)
 
-                header = (
-                    f"ไอเท็ม: {item_id} | Dept: {depts[0]} | Class: {classes[0]}\n"
-                    f"สินค้า: {row.get('สินค้า', '')}"
-                )
+                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
                 return header + "\n\n" + "\n".join(lines)
-            
-        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
-                
+            return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"    
 
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
