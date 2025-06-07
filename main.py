@@ -60,11 +60,12 @@ def search_product(keyword):
 
                 lines = []
                 for i in range(len(dates)):
+                    total_receipts = (receipts[i] or 0) + (dc[i] or 0)
                     line = (
                         f"{dates[i]} | "
                         f"Department Number: {depts[i]} | "
                         f"Class Number: {classes[i]} | "
-                        f"Receipts Qty: {receipts[i]+dc[i]} | "
+                        f"Receipts Qty: {total_receipts} | "
                         f"Inv Adjust Qty: {invs[i]} | "
                         f"EOY SOH Qty: {eoys[i]} | "
                         f"Shrinkage Qty: {shrinks[i]} | "
