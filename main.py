@@ -48,34 +48,35 @@ def search_product(keyword):
         item_id = keyword.replace("mm", "").strip()
         for row in json_data:
             if str(row.get("ไอเท็ม", "")) == item_id:
-                dates = row.get("Date", [])
-                depts = row.get("Department Number", [])
-                classes = row.get("Class Number", [])
-                receipts = row.get("Receipts Qty", [])
-                invs = row.get("Inv Adjust Qty", [])
-                eoys = row.get("EOY SOH Qty", [])
-                shrinks = row.get("Shrinkage Qty", [])
-                sales = row.get("Net Sales Qty", [])
-                dc = row.get("DC QTY", [])
+                dates = row.get("date", [])
+                depts = row.get("Dept", [])
+                classes = row.get("Class", [])
+                receipts = row.get("Receipts", [])
+                invs = row.get("InvAdjust", [])
+                eoys = row.get("EOYSOH", [])
+                shrinks = row.get("Shrink", [])
+                sales = row.get("Sales", [])
+                dc = row.get("DC", [])
 
-                lines = []
-                for i in range(len(dates)):
-                    total_receipts = (receipts[i] or 0) + (dc[i] or 0)
-                    line = (
-                        f"{dates[i]} | "
-                        f"Department Number: {depts[i]} | "
-                        f"Class Number: {classes[i]} | "
-                        f"Receipts Qty: {total_receipts} | "
-                        f"Inv Adjust Qty: {invs[i]} | "
-                        f"EOY SOH Qty: {eoys[i]} | "
-                        f"Shrinkage Qty: {shrinks[i]} | "
-                        f"Net Sales Qty: {sales[i]}"
-                    )
-                    lines.append(line)
+            lines = []
+            for i in range(len(dates)):
+                total_receipts = (receipts[i] or 0) + (dc[i] or 0)
+                line = (
+                    f"{dates[i]} | "
+                    f"Dept: {depts[i]} | "
+                    f"Class: {classes[i]} | "
+                    f"Receipts+DC: {total_receipts} | "
+                    f"Inv Adj: {invs[i]} | "
+                    f"EOY SOH: {eoys[i]} | "
+                    f"Shrink: {shrinks[i]} | "
+                    f"Sales: {sales[i]}"
+                )
+                lines.append(line)
 
-                header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
-                return header + "\n\n" + "\n".join(lines)
-            return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"    
+            header = f"ไอเท็ม: {item_id}\nสินค้า: {row.get('สินค้า', '')}"
+            return header + "\n\n" + "\n".join(lines)
+
+        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'" 
 
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
