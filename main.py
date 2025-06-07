@@ -71,22 +71,35 @@ def search_product(keyword):
                     reverse=True
                 )
 
-                lines = ["Date | Sales | Rec | Adj | SOH"]
+            # แปลงชื่อวันให้อยู่ในรูปแบบที่กำหนด
+                def short_dayname(dt):
+                    day_map = {
+                        "Mon": "M",
+                        "Tue": "Tu",
+                        "Wed": "W",
+                        "Thu": "Th",
+                        "Fri": "Fr",
+                        "Sat": "Sa",
+                        "Sun": "Su",
+                    }
+                    return day_map.get(dt.strftime("%a"), "?")
+
+                lines = ["Date  | Sales | Rec | Adj | SOH"]
                 for i in sorted_indexes:
                     try:
                         d = datetime.strptime(dates[i], "%Y-%m-%d")
-                        day = d.strftime("%a")[0]  # เช่น M, T, W...
+                        day = short_dayname(d)
                         short_date = f"{day} {d.day}/{d.month}"
                     except:
                         short_date = dates[i]
 
                     rec_total = receipts[i] + dc[i]
                     line = (
-                        f"{short_date.ljust(5)}| "
-                        f"{str(int(round(sales[i]))).rjust(3)} | "
-                        f"{str(int(round(rec_total))).rjust(3)} | "
-                        f"{str(int(round(invs[i]))).rjust(3)} | "
-                        f"{str(int(round(eoys[i]))).rjust(3)}"
+                        f"{short_date.ljust(6)}| "
+                        f"{str(int(round(sales[i]))).rjust(5)}| "
+                        f"{str(int(round(rec_total))).rjust(4)}| "
+                        f"{str(int(round(invs[i]))).rjust(5)}| "
+                        f"{str(int(round(eoys[i]))).rjust(4)}"
                     )
                     lines.append(line)
 
