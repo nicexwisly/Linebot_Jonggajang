@@ -84,21 +84,31 @@ def search_product(keyword):
                     }
                     return day_map.get(dt.strftime("%a"), "?")
 
-                lines = ["Date  | Sales | Rec | Adj | SOH"]
+                lines = ["Date    | Sales | Rec  | Adj  | SOH"]
                 for i in sorted_indexes:
                     try:
                         d = datetime.strptime(dates[i], "%Y-%m-%d")
                         day = short_dayname(d)
+                        day_map = {
+                            "Mon": "M",
+                            "Tue": "Tu",
+                            "Wed": "W",
+                            "Thu": "Th",
+                            "Fri": "Fr",
+                            "Sat": "Sa",
+                            "Sun": "Su",
+                        }
+                        day = day_map.get(d.strftime("%a"), "?")
                         short_date = f"{day} {d.day}/{d.month}"
                     except:
                         short_date = dates[i]
 
                     rec_total = receipts[i] + dc[i]
                     line = (
-                        f"{short_date.ljust(6)}| "
-                        f"{str(int(round(sales[i]))).rjust(5)}| "
-                        f"{str(int(round(rec_total))).rjust(4)}| "
-                        f"{str(int(round(invs[i]))).rjust(5)}| "
+                        f"{short_date.ljust(8)}| "
+                        f"{str(int(round(sales[i]))).rjust(5)} | "
+                        f"{str(int(round(rec_total))).rjust(5)} | "
+                        f"{str(int(round(invs[i]))).rjust(5)} | "
                         f"{str(int(round(eoys[i]))).rjust(4)}"
                     )
                     lines.append(line)
@@ -107,7 +117,7 @@ def search_product(keyword):
                     f"ไอเท็ม: {item_id} | Dept: {depts[0]} | Class: {classes[0]}\n"
                     f"สินค้า: {row.get('สินค้า', '')}"
                 )
-                return header + "\n\n" + "\n".join(lines)
+                return header + "\n\n" + "```\n" + "\n".join(lines) + "\n```"
 
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
 
