@@ -46,6 +46,7 @@ def search_product(keyword):
     
     if keyword.startswith("mm"):
         item_id = keyword.replace("mm", "").strip()
+        
         for row in json_data:
             if str(row.get("ไอเท็ม", "")) == item_id:
                 dates = row.get("date", [])
@@ -56,6 +57,7 @@ def search_product(keyword):
                 eoys = row.get("EOYSOH", [])
                 sales = row.get("Sales", [])
                 dc = row.get("DC", [])
+                sales_realtime = row.get("Sales_Realtime", None)
 
             # แก้ None เป็น 0
                 receipts = [r if r is not None else 0 for r in receipts]
@@ -85,6 +87,25 @@ def search_product(keyword):
                     return day_map.get(dt.strftime("%a"), "?")
 
                 lines = ["Date    | Sales | Rec  | Adj  | SOH"]
+                
+                # เพิ่มข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก (ถ้ามี)
+                if sales_realtime is not None:
+                    try:
+                        realtime_sales = float(sales_realtime) if sales_realtime is not None else 0
+                        
+                        # แสดงข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก
+                        realtime_line = (
+                            f"RT Today | "
+                            f"{str(int(round(realtime_sales))).rjust(5)} | "
+                            f"{str(0).rjust(5)} | "
+                            f"{str(0).rjust(5)} | "
+                            f"{str(0).rjust(4)}"
+                        )
+                        lines.append(realtime_line)
+                        lines.append("-" * 35)  # เส้นคั่น
+                    except Exception as e:
+                        print(f"Error processing Sales_Realtime data: {e}")
+                
                 for i in sorted_indexes:
                     try:
                         d = datetime.strptime(dates[i], "%Y-%m-%d")
