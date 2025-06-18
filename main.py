@@ -33,204 +33,6 @@ def reply_to_line(reply_token, message_data):
     r = requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=body)
     return r
 
-def create_product_flex(results):
-    """สร้าง Flex Message สำหรับแสดงรายการสินค้า"""
-    
-    # จำกัดจำนวนผลลัพธ์
-    if len(results) > 10:
-        results = results[:10]
-    
-    contents = []
-    
-    for i, product in enumerate(results):
-        item_id = product.get('ไอเท็ม', '')
-        plu = product.get('PLU', 'ไม่พบ')
-        name = product.get('สินค้า', '')
-        price = product.get('ราคา', '')
-        stock = product.get('มี Stock อยู่ที่', '')
-        on_order = product.get('On Order', '')
-        
-        # กำหนดสีของ stock
-        stock_color = "#FF5551" if float(str(stock).replace("~", "").strip() or "0") <= 0 else "#00C851"
-        
-        bubble = {
-            "type": "bubble",
-            "body": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {
-                        "type": "text",
-                        "text": f"#{i+1}",
-                        "weight": "bold",
-                        "color": "#1DB446",
-                        "size": "sm"
-                    },
-                    {
-                        "type": "text",
-                        "text": name[:50] + ("..." if len(name) > 50 else ""),
-                        "weight": "bold",
-                        "size": "md",
-                        "wrap": True,
-                        "margin": "md"
-                    },
-                    {
-                        "type": "separator",
-                        "margin": "md"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "md",
-                        "spacing": "sm",
-                        "contents": [
-                            {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "ไอเท็ม:",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": str(item_id),
-                                        "wrap": True,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 3
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "PLU:",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": str(plu),
-                                        "wrap": True,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 3
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "ราคา:",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": f"{price} บาท",
-                                        "wrap": True,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 3
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "คงเหลือ:",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": f"{stock} ชิ้น",
-                                        "wrap": True,
-                                        "color": stock_color,
-                                        "size": "sm",
-                                        "flex": 3,
-                                        "weight": "bold"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": "On Order:",
-                                        "color": "#aaaaaa",
-                                        "size": "sm",
-                                        "flex": 2
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": f"{on_order} mu",
-                                        "wrap": True,
-                                        "color": "#666666",
-                                        "size": "sm",
-                                        "flex": 3
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ],
-                "spacing": "sm",
-                "paddingAll": "13px"
-            },
-            "footer": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "sm",
-                "contents": [
-                    {
-                        "type": "button",
-                        "style": "link",
-                        "height": "sm",
-                        "action": {
-                            "type": "message",
-                            "label": "ดูรายละเอียด",
-                            "text": f"@@mm{item_id}"
-                        }
-                    }
-                ],
-                "flex": 0
-            }
-        }
-        contents.append(bubble)
-    
-    return {
-        "type": "flex",
-        "altText": f"พบสินค้า {len(results)} รายการ",
-        "contents": {
-            "type": "carousel",
-            "contents": contents
-        }
-    }
-
 def create_item_detail_flex(item_data, lines):
     """สร้าง Flex Message สำหรับแสดงรายละเอียดสินค้า (mm command)"""
     
@@ -257,6 +59,11 @@ def create_item_detail_flex(item_data, lines):
             # สีของยอดขาย
             sales_color = "#FF5551" if sales == "0" else "#00C851"
             
+            # ตรวจสอบค่าติดลบ
+            rec_color = "#FF5551" if rec.startswith('-') else "#666666"
+            adj_color = "#FF5551" if adj.startswith('-') else "#666666"
+            soh_color = "#FF5551" if soh.startswith('-') else "#666666"
+            
             table_contents.append({
                 "type": "box",
                 "layout": "horizontal",
@@ -280,7 +87,7 @@ def create_item_detail_flex(item_data, lines):
                         "type": "text",
                         "text": rec,
                         "size": "xs",
-                        "color": "#666666",
+                        "color": rec_color,
                         "flex": 1,
                         "align": "center"
                     },
@@ -288,7 +95,7 @@ def create_item_detail_flex(item_data, lines):
                         "type": "text",
                         "text": adj,
                         "size": "xs",
-                        "color": "#666666",
+                        "color": adj_color,
                         "flex": 1,
                         "align": "center"
                     },
@@ -296,7 +103,7 @@ def create_item_detail_flex(item_data, lines):
                         "type": "text",
                         "text": soh,
                         "size": "xs",
-                        "color": "#666666",
+                        "color": soh_color,
                         "flex": 1,
                         "align": "center"
                     }
@@ -306,7 +113,7 @@ def create_item_detail_flex(item_data, lines):
     
     return {
         "type": "flex",
-        "altText": f"รายละเอียดสินค้า {item_info}",
+        "altText": f"รายละเอียดสินค้า {product_name}",
         "contents": {
             "type": "bubble",
             "header": {
@@ -315,24 +122,17 @@ def create_item_detail_flex(item_data, lines):
                 "contents": [
                     {
                         "type": "text",
-                        "text": "รายละเอียดสินค้า",
+                        "text": product_name[:60] + ("..." if len(product_name) > 60 else ""),
                         "weight": "bold",
                         "color": "#1DB446",
-                        "size": "sm"
+                        "size": "md",
+                        "wrap": True
                     },
                     {
                         "type": "text",
                         "text": item_info,
-                        "weight": "bold",
-                        "size": "md",
-                        "margin": "md"
-                    },
-                    {
-                        "type": "text",
-                        "text": product_name[:60] + ("..." if len(product_name) > 60 else ""),
                         "size": "sm",
                         "color": "#666666",
-                        "wrap": True,
                         "margin": "sm"
                     }
                 ],
@@ -471,11 +271,20 @@ def search_product(keyword):
                 # เพิ่มข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก (ถ้ามี)
                 if sales_realtime is not None:
                     try:
-                        realtime_sales = float(sales_realtime) if sales_realtime is not None else 0
-                        realtime_stock = float(current_stock) if current_stock is not None else 0
+                        # ลบ comma ออกจากตัวเลข
+                        realtime_sales_str = str(sales_realtime).replace(',', '') if sales_realtime is not None else '0'
+                        current_stock_str = str(current_stock).replace(',', '').replace('~', '').strip() if current_stock is not None else '0'
+                        
+                        realtime_sales = float(realtime_sales_str)
+                        realtime_stock = float(current_stock_str)
+                        
+                        # สร้างวันที่วันนี้
+                        today = datetime.now()
+                        today_day = short_dayname(today)
+                        today_date = f"{today_day} {today.day}/{today.month}"
                         
                         realtime_line = (
-                            f"Today    | "
+                            f"{today_date.ljust(8)}| "
                             f"{str(int(round(realtime_sales))).rjust(5)} | "
                             f"{str(0).rjust(5)} | "
                             f"{str(0).rjust(5)} | "
@@ -513,7 +322,7 @@ def search_product(keyword):
 
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
 
-    # ค้นหาสินค้าปกติ
+    # ค้นหาสินค้าปกติ - ส่งกลับเป็นข้อความธรรมดา
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
         item_id = str(row.get("ไอเท็ม", "")).split(".")[0]
@@ -550,8 +359,36 @@ def search_product(keyword):
     # เรียงตาม Stock จากมากไปน้อย
     results = sorted(results, key=lambda r: float(str(r.get("มี Stock อยู่ที่", "0")).replace("~", "").strip()), reverse=True)
 
-    # ส่งกลับเป็น Flex Message สำหรับรายการสินค้า
-    return create_product_flex(results)
+    # จำกัดจำนวนผลลัพธ์
+    max_results = 10
+    if len(results) > max_results:
+        results = results[:max_results]
+    
+    # สร้างข้อความธรรมดา
+    response_text = f"🔍 พบสินค้า {len(results)} รายการ:\n\n"
+    
+    for i, product in enumerate(results, 1):
+        item_id = product.get('ไอเท็ม', '')
+        plu = product.get('PLU', 'ไม่พบ')
+        name = product.get('สินค้า', '')
+        price = product.get('ราคา', '')
+        stock = product.get('มี Stock อยู่ที่', '')
+        on_order = product.get('On Order', '')
+        
+        # แสดงชื่อสินค้า (จำกัดความยาว)
+        display_name = name[:40] + "..." if len(name) > 40 else name
+        
+        # กำหนดไอคอนสำหรับ stock
+        stock_value = float(str(stock).replace("~", "").strip() or "0")
+        stock_icon = "❌" if stock_value <= 0 else "✅"
+        
+        response_text += f"{i}. {display_name}\n"
+        response_text += f"   ไอเท็ม: {item_id} | PLU: {plu}\n"
+        response_text += f"   ราคา: {price} บาท\n"
+        response_text += f"   {stock_icon} คงเหลือ: {stock} ชิ้น | On Order: {on_order}\n"
+        response_text += f"   📋 ดูรายละเอียด: @@mm{item_id}\n\n"
+    
+    return response_text
 
 @app.route("/callback", methods=["POST"])
 def callback():
