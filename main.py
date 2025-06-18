@@ -98,14 +98,13 @@ def search_product(keyword):
                         
                         # แสดงข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก
                         realtime_line = (
-                            f"RT Today | "
+                            f"Today    | "
                             f"{str(int(round(realtime_sales))).rjust(5)} | "
                             f"{str(0).rjust(5)} | "
                             f"{str(0).rjust(5)} | "
                             f"{str(int(round(realtime_stock))).rjust(4)}"
                         )
                         lines.append(realtime_line)
-                        lines.append("-" * 35)  # เส้นคั่น
                     except Exception as e:
                         print(f"Error processing Sales_Realtime data: {e}")
                 
