@@ -58,6 +58,7 @@ def search_product(keyword):
                 sales = row.get("Sales", [])
                 dc = row.get("DC", [])
                 sales_realtime = row.get("Sales_Realtime", None)
+                current_stock = row.get("มี Stock อยู่ที่", None)
 
             # แก้ None เป็น 0
                 receipts = [r if r is not None else 0 for r in receipts]
@@ -92,6 +93,8 @@ def search_product(keyword):
                 if sales_realtime is not None:
                     try:
                         realtime_sales = float(sales_realtime) if sales_realtime is not None else 0
+                        # ใช้ Stock ปัจจุบันจาก "มี Stock อยู่ที่"
+                        realtime_stock = float(current_stock) if current_stock is not None else 0
                         
                         # แสดงข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก
                         realtime_line = (
@@ -99,7 +102,7 @@ def search_product(keyword):
                             f"{str(int(round(realtime_sales))).rjust(5)} | "
                             f"{str(0).rjust(5)} | "
                             f"{str(0).rjust(5)} | "
-                            f"{str(0).rjust(4)}"
+                            f"{str(int(round(realtime_stock))).rjust(4)}"
                         )
                         lines.append(realtime_line)
                         lines.append("-" * 35)  # เส้นคั่น
