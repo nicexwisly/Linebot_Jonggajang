@@ -385,8 +385,7 @@ def search_product(keyword):
         response_text += f"{i}. {display_name}\n"
         response_text += f"   ไอเท็ม: {item_id} | PLU: {plu}\n"
         response_text += f"   ราคา: {price} บาท\n"
-        response_text += f"   {stock_icon} คงเหลือ: {stock} ชิ้น | On Order: {on_order}\n"
-        response_text += f"   📋 ดูรายละเอียด: @@mm{item_id}\n\n"
+        response_text += f"   {stock_icon} คงเหลือ: {stock} ชิ้น | On Order: {on_order}\n\n"
     
     return response_text
 
