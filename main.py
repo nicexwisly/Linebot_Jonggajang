@@ -33,6 +33,199 @@ def reply_to_line(reply_token, message_data):
     r = requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=body)
     return r
 
+def create_product_search_flex(results, keyword):
+    """สร้าง Flex Message สำหรับแสดงผลการค้นหาสินค้า"""
+    
+    # สร้างรายการสินค้า
+    product_contents = []
+    
+    for i, product in enumerate(results):
+        item_id = product.get('ไอเท็ม', '')
+        plu = product.get('PLU', 'ไม่พบ')
+        name = product.get('สินค้า', '')
+        price = product.get('ราคา', '')
+        stock = product.get('มี Stock อยู่ที่', '')
+        on_order = product.get('On Order', '')
+        
+        # แสดงชื่อสินค้า (จำกัดความยาว)
+        display_name = name[:35] + "..." if len(name) > 35 else name
+        
+        # กำหนดสีสำหรับ stock
+        stock_value = float(str(stock).replace("~", "").strip() or "0")
+        stock_color = "#FF5551" if stock_value <= 0 else "#00C851"
+        stock_icon = "❌" if stock_value <= 0 else "✅"
+        
+        # สร้างแต่ละรายการสินค้า
+        product_box = {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": f"{i+1}.",
+                            "size": "sm",
+                            "color": "#1DB446",
+                            "weight": "bold",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": display_name,
+                            "size": "sm",
+                            "color": "#333333",
+                            "weight": "bold",
+                            "wrap": True,
+                            "margin": "sm",
+                            "flex": 1
+                        }
+                    ]
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": f"ไอเท็ม: {item_id}",
+                            "size": "xs",
+                            "color": "#666666",
+                            "flex": 1
+                        },
+                        {
+                            "type": "text",
+                            "text": f"PLU: {plu}",
+                            "size": "xs",
+                            "color": "#666666",
+                            "flex": 1
+                        }
+                    ],
+                    "margin": "sm"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": f"ราคา: {price} บาท",
+                            "size": "xs",
+                            "color": "#333333",
+                            "flex": 1
+                        },
+                        {
+                            "type": "text",
+                            "text": f"On Order: {on_order}",
+                            "size": "xs",
+                            "color": "#666666",
+                            "flex": 1
+                        }
+                    ],
+                    "margin": "xs"
+                },
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": f"{stock_icon} คงเหลือ: {stock} ชิ้น",
+                            "size": "xs",
+                            "color": stock_color,
+                            "weight": "bold",
+                            "flex": 1
+                        },
+                        {
+                            "type": "text",
+                            "text": f"@@mm{item_id}",
+                            "size": "xs",
+                            "color": "#1DB446",
+                            "weight": "bold",
+                            "flex": 0,
+                            "align": "end"
+                        }
+                    ],
+                    "margin": "xs"
+                }
+            ],
+            "margin": "md",
+            "paddingAll": "12px",
+            "backgroundColor": "#F8F9FA",
+            "cornerRadius": "8px"
+        }
+        
+        product_contents.append(product_box)
+        
+        # เพิ่ม separator ระหว่างรายการ (ยกเว้นรายการสุดท้าย)
+        if i < len(results) - 1:
+            product_contents.append({
+                "type": "separator",
+                "margin": "md"
+            })
+    
+    return {
+        "type": "flex",
+        "altText": f"ผลการค้นหา: {keyword}",
+        "contents": {
+            "type": "bubble",
+            "size": "mega",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "🔍 ผลการค้นหาสินค้า",
+                        "weight": "bold",
+                        "color": "#1DB446",
+                        "size": "lg"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"คำค้นหา: {keyword}",
+                        "size": "sm",
+                        "color": "#666666",
+                        "margin": "sm"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"พบ {len(results)} รายการ",
+                        "size": "sm",
+                        "color": "#1DB446",
+                        "weight": "bold",
+                        "margin": "xs"
+                    }
+                ],
+                "paddingAll": "20px",
+                "paddingBottom": "16px"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": product_contents,
+                "spacing": "none",
+                "paddingAll": "20px"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "💡 ใช้ @@mm[ไอเท็ม] เพื่อดูรายละเอียด",
+                        "size": "xs",
+                        "color": "#999999",
+                        "align": "center"
+                    }
+                ],
+                "paddingAll": "12px"
+            }
+        }
+    }
+
 def create_item_detail_flex(item_data, lines):
     """สร้าง Flex Message สำหรับแสดงรายละเอียดสินค้า (mm command)"""
     
@@ -322,7 +515,7 @@ def search_product(keyword):
 
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
 
-    # ค้นหาสินค้าปกติ - ส่งกลับเป็นข้อความธรรมดา
+    # ค้นหาสินค้าปกติ - ส่งกลับเป็น Flex Message
     for row in json_data:
         name = row.get("สินค้า", "").lower().replace(" ", "")
         item_id = str(row.get("ไอเท็ม", "")).split(".")[0]
@@ -364,30 +557,8 @@ def search_product(keyword):
     if len(results) > max_results:
         results = results[:max_results]
     
-    # สร้างข้อความธรรมดา
-    response_text = f"🔍 พบสินค้า {len(results)} รายการ:\n\n"
-    
-    for i, product in enumerate(results, 1):
-        item_id = product.get('ไอเท็ม', '')
-        plu = product.get('PLU', 'ไม่พบ')
-        name = product.get('สินค้า', '')
-        price = product.get('ราคา', '')
-        stock = product.get('มี Stock อยู่ที่', '')
-        on_order = product.get('On Order', '')
-        
-        # แสดงชื่อสินค้า (จำกัดความยาว)
-        display_name = name[:40] + "..." if len(name) > 40 else name
-        
-        # กำหนดไอคอนสำหรับ stock
-        stock_value = float(str(stock).replace("~", "").strip() or "0")
-        stock_icon = "❌" if stock_value <= 0 else "✅"
-        
-        response_text += f"{i}. {display_name}\n"
-        response_text += f"   ไอเท็ม: {item_id} | PLU: {plu}\n"
-        response_text += f"   ราคา: {price} บาท\n"
-        response_text += f"   {stock_icon} คงเหลือ: {stock} ชิ้น | On Order: {on_order}\n\n"
-    
-    return response_text
+    # ส่งกลับเป็น Flex Message
+    return create_product_search_flex(results, keyword)
 
 @app.route("/callback", methods=["POST"])
 def callback():
