@@ -161,6 +161,73 @@ def create_product_search_flex(results, keyword):
         }
         
         product_contents.append(product_box)
+        
+        # เพิ่ม separator ระหว่างรายการ (ยกเว้นรายการสุดท้าย)
+        if i < len(results) - 1:
+            product_contents.append({
+                "type": "separator",
+                "margin": "md"
+            })
+    
+    return {
+        "type": "flex",
+        "altText": f"ผลการค้นหา: {keyword}",
+        "contents": {
+            "type": "bubble",
+            "size": "mega",
+            "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "🔍 ผลการค้นหาสินค้า",
+                        "weight": "bold",
+                        "color": "#1DB446",
+                        "size": "lg"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"คำค้นหา: {keyword}",
+                        "size": "sm",
+                        "color": "#666666",
+                        "margin": "sm"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"พบ {len(results)} รายการ",
+                        "size": "sm",
+                        "color": "#1DB446",
+                        "weight": "bold",
+                        "margin": "xs"
+                    }
+                ],
+                "paddingAll": "20px",
+                "paddingBottom": "16px"
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": product_contents,
+                "spacing": "none",
+                "paddingAll": "20px"
+            },
+            "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "💡 กดปุ่ม mm เพื่อดูรายละเอียดสินค้า",
+                        "size": "xs",
+                        "color": "#999999",
+                        "align": "center"
+                    }
+                ],
+                "paddingAll": "12px"
+            }
+        }
+    }
 
 def create_item_detail_flex(item_data, lines):
     """สร้าง Flex Message สำหรับแสดงรายละเอียดสินค้า (mm command)"""
