@@ -36,6 +36,13 @@ def reply_to_line(reply_token, message_data):
 def create_product_search_flex(results, keyword):
     """สร้าง Flex Message สำหรับแสดงผลการค้นหาสินค้า - ดีไซน์ใหม่"""
     
+    # ปรับแปลง keyword ให้แสดงใน header
+    display_keyword = keyword
+    if keyword.startswith("plu"):
+        display_keyword = keyword  # แสดง plu0342
+    else:
+        display_keyword = keyword  # แสดง 129101
+    
     # สร้างรายการสินค้า
     product_contents = []
     
@@ -196,7 +203,7 @@ def create_product_search_flex(results, keyword):
     
     return {
         "type": "flex",
-        "altText": f"ผลการค้นหา: {keyword} (พบ {len(results)} รายการ)",
+        "altText": f"ผลการค้นหา: {display_keyword} (พบ {len(results)} รายการ)",
         "contents": {
             "type": "bubble",
             "size": "mega",
@@ -206,16 +213,10 @@ def create_product_search_flex(results, keyword):
                 "contents": [
                     {
                         "type": "text",
-                        "size": "xl",
-                        "flex": 0
-                    },
-                    {
-                        "type": "text",
-                        "text": keyword,
+                        "text": display_keyword,
                         "size": "xl",
                         "color": "#FFFFFF",
                         "weight": "bold",
-                        "margin": "sm",
                         "flex": 1
                     },
                     {
@@ -578,6 +579,7 @@ def search_product(keyword):
 def callback():
     body = request.json
     try:
+        print("Received webhook:", body)  # Add logging
         events = body.get("events", [])
         for event in events:
             reply_token = event["replyToken"]
@@ -585,10 +587,13 @@ def callback():
             # Handle text messages
             if event.get("type") == "message" and event["message"]["type"] == "text":
                 user_msg = event["message"]["text"]
+                print(f"Received message: {user_msg}")  # Add logging
 
                 if user_msg.startswith("@@"):
                     keyword = user_msg.replace("@@", "").strip()
+                    print(f"Searching for keyword: {keyword}")  # Add logging
                     answer = search_product(keyword)
+                    print(f"Search result: {answer}")  # Add logging
                     reply_to_line(reply_token, answer)
                 else:
                     # ถ้าไม่ใช่ @@ → ไม่ตอบกลับ
