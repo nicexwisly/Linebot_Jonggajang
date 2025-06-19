@@ -34,7 +34,7 @@ def reply_to_line(reply_token, message_data):
     return r
 
 def create_product_search_flex(results, keyword):
-    """สร้าง Flex Message สำหรับแสดงผลการค้นหาสินค้า"""
+    """สร้าง Flex Message สำหรับแสดงผลการค้นหาสินค้า - ดีไซน์ใหม่"""
     
     # สร้างรายการสินค้า
     product_contents = []
@@ -48,137 +48,194 @@ def create_product_search_flex(results, keyword):
         on_order = product.get('On Order', '')
         
         # แสดงชื่อสินค้า (จำกัดความยาว)
-        display_name = name[:35] + "..." if len(name) > 35 else name
+        display_name = name[:40] + "..." if len(name) > 40 else name
         
-        # กำหนดสีสำหรับ stock
+        # กำหนดสีและไอคอนสำหรับ stock
         stock_value = float(str(stock).replace("~", "").strip() or "0")
-        stock_color = "#FF5551" if stock_value <= 0 else "#00C851"
-        stock_icon = "❌" if stock_value <= 0 else "✅"
+        if stock_value <= 0:
+            stock_color = "#FF5551"
+            stock_icon = "🔴"
+            stock_text = "หมด"
+        else:
+            stock_color = "#00C851"
+            stock_icon = "🟢"
+            stock_text = f"คงเหลือ: {int(stock_value)} ชิ้น"
         
         # สร้างแต่ละรายการสินค้า
         product_box = {
             "type": "box",
             "layout": "vertical",
             "contents": [
+                # Header box with number and product name
                 {
                     "type": "box",
                     "layout": "horizontal",
                     "contents": [
                         {
-                            "type": "text",
-                            "text": f"{i+1}.",
-                            "size": "sm",
-                            "color": "#1DB446",
-                            "weight": "bold",
+                            "type": "box",
+                            "layout": "baseline",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": str(i + 1),
+                                    "size": "lg",
+                                    "color": "#FFFFFF",
+                                    "weight": "bold",
+                                    "align": "center"
+                                }
+                            ],
+                            "backgroundColor": "#1DB446",
+                            "cornerRadius": "50px",
+                            "width": "28px",
+                            "height": "28px",
+                            "paddingAll": "2px",
                             "flex": 0
                         },
                         {
                             "type": "text",
                             "text": display_name,
-                            "size": "sm",
+                            "size": "md",
                             "color": "#333333",
                             "weight": "bold",
                             "wrap": True,
-                            "margin": "sm",
-                            "flex": 1
-                        }
-                    ]
-                },
-                {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": f"ไอเท็ม: {item_id}",
-                            "size": "xs",
-                            "color": "#666666",
-                            "flex": 1
-                        },
-                        {
-                            "type": "text",
-                            "text": f"PLU: {plu}",
-                            "size": "xs",
-                            "color": "#666666",
+                            "margin": "md",
                             "flex": 1
                         }
                     ],
-                    "margin": "sm"
+                    "spacing": "sm"
                 },
+                
+                # Product details box
                 {
                     "type": "box",
-                    "layout": "horizontal",
+                    "layout": "vertical",
                     "contents": [
+                        # Item ID and PLU row
                         {
-                            "type": "text",
-                            "text": f"ราคา: {price} บาท",
-                            "size": "xs",
-                            "color": "#666666",
-                            "flex": 1
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": f"ไอเท็ม: {item_id}",
+                                    "size": "sm",
+                                    "color": "#666666",
+                                    "flex": 1
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"PLU: {plu}",
+                                    "size": "sm",
+                                    "color": "#666666",
+                                    "flex": 1
+                                }
+                            ]
                         },
+                        
+                        # Stock status and price row
                         {
-                            "type": "text",
-                            "text": f"On Order: {on_order}",
-                            "size": "xs",
-                            "color": "#666666",
-                            "flex": 1
-                        }
-                    ],
-                    "margin": "xs"
-                },
-                {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "contents": [
-                        {
-                            "type": "text",
-                            "text": f"{stock_icon} คงเหลือ: {stock} ชิ้น",
-                            "size": "xs",
-                            "color": stock_color,
-                            "weight": "bold",
-                            "flex": 2
+                            "type": "box",
+                            "layout": "horizontal",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": f"{stock_icon} {stock_text}",
+                                    "size": "sm",
+                                    "color": stock_color,
+                                    "weight": "bold",
+                                    "flex": 2
+                                },
+                                {
+                                    "type": "text",
+                                    "text": f"{price} บาท",
+                                    "size": "sm",
+                                    "color": "#333333",
+                                    "weight": "bold",
+                                    "align": "end",
+                                    "flex": 1
+                                }
+                            ],
+                            "margin": "sm"
                         },
+                        
+                        # Movement button
                         {
                             "type": "button",
                             "action": {
                                 "type": "postback",
-                                "label": "Movement",
-                                "size": "xs",
+                                "label": "รายละเอียด",
                                 "data": f"@@mm{item_id}"
                             },
-                            "style": "secondary",
+                            "style": "primary",
                             "color": "#1DB446",
                             "height": "sm",
-                            "flex": 1,
-                            "margin": "sm"                                             
+                            "margin": "md"
                         }
                     ],
-                    "margin": "xs"
+                    "spacing": "sm",
+                    "backgroundColor": "#F8F9FA",
+                    "cornerRadius": "8px",
+                    "paddingAll": "12px",
+                    "margin": "sm"
                 }
             ],
+            "spacing": "none",
+            "paddingAll": "0px"
         }
         
         product_contents.append(product_box)
         
-        # เพิ่ม separator ระหว่างรายการ (ยกเว้นรายการสุดท้าย)
+        # เพิ่ม spacing ระหว่างรายการ (ยกเว้นรายการสุดท้าย)
         if i < len(results) - 1:
             product_contents.append({
-                "type": "separator",
-                "margin": "md"
+                "type": "box",
+                "layout": "vertical",
+                "contents": [],
+                "height": "12px"
             })
     
     return {
         "type": "flex",
-        "altText": f"ผลการค้นหา: {keyword}",
+        "altText": f"ผลการค้นหา: {keyword} (พบ {len(results)} รายการ)",
         "contents": {
             "type": "bubble",
             "size": "mega",
+            "header": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                    {
+                        "type": "text",
+                        "size": "xl",
+                        "flex": 0
+                    },
+                    {
+                        "type": "text",
+                        "text": keyword,
+                        "size": "xl",
+                        "color": "#FFFFFF",
+                        "weight": "bold",
+                        "margin": "sm",
+                        "flex": 1
+                    },
+                    {
+                        "type": "text",
+                        "text": f"พบ {len(results)} รายการ",
+                        "size": "sm",
+                        "color": "#FFFFFF",
+                        "align": "end",
+                        "flex": 0
+                    }
+                ],
+                "backgroundColor": "#1DB446",
+                "paddingAll": "20px"
+            },
             "body": {
                 "type": "box",
                 "layout": "vertical",
                 "contents": product_contents,
                 "spacing": "none",
-                "paddingAll": "20px"
+                "paddingAll": "16px"
             }
         }
     }
