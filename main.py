@@ -113,7 +113,7 @@ def create_product_search_flex(results, keyword):
                             "type": "text",
                             "text": f"ราคา: {price} บาท",
                             "size": "xs",
-                            "color": "#333333",
+                            "color": "#666666",
                             "flex": 1
                         },
                         {
@@ -143,6 +143,7 @@ def create_product_search_flex(results, keyword):
                             "action": {
                                 "type": "postback",
                                 "label": "Movement",
+                                "size": "xs",
                                 "data": f"@@mm{item_id}"
                             },
                             "style": "secondary",
@@ -155,10 +156,6 @@ def create_product_search_flex(results, keyword):
                     "margin": "xs"
                 }
             ],
-            "margin": "md",
-            "paddingAll": "12px",
-            "backgroundColor": "#F8F9FA",
-            "cornerRadius": "8px"
         }
         
         product_contents.append(product_box)
