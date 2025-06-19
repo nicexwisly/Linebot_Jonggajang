@@ -136,7 +136,7 @@ def create_product_search_flex(results, keyword):
                             "size": "xs",
                             "color": stock_color,
                             "weight": "bold",
-                            "flex": 1
+                            "flex": 3
                         },
                         {
                             "type": "button",
@@ -145,10 +145,11 @@ def create_product_search_flex(results, keyword):
                                 "label": "Movement",
                                 "data": f"@@mm{item_id}"
                             },
-                            "style": "primary",
+                            "style": "secondary",
                             "color": "#1DB446",
                             "height": "sm",
-                            "flex": 0
+                            "flex": 1,
+                            "margin": "sm"                                             
                         }
                     ],
                     "margin": "xs"
