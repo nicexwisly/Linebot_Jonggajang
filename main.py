@@ -136,7 +136,7 @@ def create_product_search_flex(results, keyword):
                             "size": "xs",
                             "color": stock_color,
                             "weight": "bold",
-                            "flex": 3
+                            "flex": 2
                         },
                         {
                             "type": "button",
