@@ -73,6 +73,45 @@ def create_product_search_flex(results, keyword):
             "type": "box",
             "layout": "vertical",
             "contents": [
+                # Header box with number and product name
+                {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                        {
+                            "type": "box",
+                            "layout": "baseline",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": str(i + 1),
+                                    "size": "lg",
+                                    "color": "#FFFFFF",
+                                    "weight": "bold",
+                                    "align": "center"
+                                }
+                            ],
+                            "backgroundColor": "#1DB446",
+                            "cornerRadius": "50px",
+                            "width": "28px",
+                            "height": "28px",
+                            "paddingAll": "2px",
+                            "flex": 0
+                        },
+                        {
+                            "type": "text",
+                            "text": display_name,
+                            "size": "md",
+                            "color": "#333333",
+                            "weight": "bold",
+                            "wrap": True,
+                            "margin": "md",
+                            "flex": 1
+                        }
+                    ],
+                    "spacing": "sm"
+                },
+                
                 # Product details box
                 {
                     "type": "box",
@@ -95,17 +134,8 @@ def create_product_search_flex(results, keyword):
                                     "text": f"PLU: {plu}",
                                     "size": "sm",
                                     "color": "#666666",
-                                    "align": "center",
                                     "flex": 1
-                               },
-                               {
-                                    "type": "text",
-                                    "text": f"{price} บาท",
-                                    "size": "sm",
-                                    "color": "#666666",
-                                    "align": "end",
-                                    "flex": 1                                   
-                               }
+                                }
                             ]
                         },
                         
@@ -122,6 +152,15 @@ def create_product_search_flex(results, keyword):
                                     "weight": "bold",
                                     "flex": 2
                                 },
+                                {
+                                    "type": "text",
+                                    "text": f"{price} บาท",
+                                    "size": "sm",
+                                    "color": "#333333",
+                                    "weight": "bold",
+                                    "align": "end",
+                                    "flex": 1
+                                }
                             ],
                             "margin": "sm"
                         },
@@ -131,13 +170,13 @@ def create_product_search_flex(results, keyword):
                             "type": "button",
                             "action": {
                                 "type": "postback",
-                                "label": "Movement",
+                                "label": "รายละเอียด",
                                 "data": f"@@mm{item_id}"
                             },
                             "style": "primary",
                             "color": "#1DB446",
                             "height": "sm",
-                            "margin": "xs"
+                            "margin": "md"
                         }
                     ],
                     "spacing": "sm",
@@ -164,7 +203,7 @@ def create_product_search_flex(results, keyword):
     
     return {
         "type": "flex",
-        "altText": f"ผลการค้นหา: {display_keyword}",
+        "altText": f"ผลการค้นหา: {display_keyword} (พบ {len(results)} รายการ)",
         "contents": {
             "type": "bubble",
             "size": "mega",
@@ -175,11 +214,19 @@ def create_product_search_flex(results, keyword):
                     {
                         "type": "text",
                         "text": display_keyword,
-                        "size": "sm",
+                        "size": "xl",
                         "color": "#FFFFFF",
                         "weight": "bold",
-                        "flex": 2
+                        "flex": 1
                     },
+                    {
+                        "type": "text",
+                        "text": f"พบ {len(results)} รายการ",
+                        "size": "sm",
+                        "color": "#FFFFFF",
+                        "align": "end",
+                        "flex": 0
+                    }
                 ],
                 "backgroundColor": "#1DB446",
                 "paddingAll": "20px"
