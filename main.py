@@ -510,7 +510,11 @@ def search_product(keyword):
                     except:
                         short_date = dates[i]
 
-                    rec_total = receipts[i] + dc[i]
+                    if i == 0 and row.get("GOR_Received")is not None:
+                        rec_total = float(row["GOR_Received"])
+                    else:                      
+                        rec_total = receipts[i] + dc[i]
+
                     line = (
                         f"{short_date.ljust(8)}| "
                         f"{str(int(round(sales[i]))).rjust(5)} | "
