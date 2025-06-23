@@ -479,11 +479,13 @@ def search_product(keyword):
                 # เพิ่มข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก (ถ้ามี)
                 if sales_realtime is not None or row.get("GOR_Received") is not None:
                     try:
-                        realtime_sales = float(str(sales_realtime).replace(",", ""))
-                        current_stock_str = str(current_stock).replace(",", "").replace("~", "").strip()
-                        realtime_stock = float(current_stock_str) if current_stock_str else 0
+                        sales_realtime_raw = str(sales_realtime).replace(",", "").strip() if sales_realtime is not None else "0"
+                        realtime_sales = float(sales_realtime_raw)
+                        
+                        current_stock_raw = str(current_stock).replace(",", "").replace("~", "").strip() if current_stock is not None else "0"
+                        realtime_stock = float(current_stock_raw)   
 
-                        gor_rec = float(row.get("GOR_Received", 0))
+                        gor_rec = float(row.get("GOR_Received", 0) or 0)
                         
                         # สร้างวันที่วันนี้
                         today = datetime.now()
