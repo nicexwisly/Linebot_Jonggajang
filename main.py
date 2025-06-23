@@ -439,7 +439,7 @@ def search_product(keyword):
     # ตรวจสอบคำสั่ง mm สำหรับรายละเอียดสินค้า
     if keyword.startswith("mm"):
         item_id = keyword.replace("mm", "").strip()
-        
+
         for row in json_data:
             if str(row.get("ไอเท็ม", "")) == item_id:
                 dates = row.get("date", [])
@@ -453,14 +453,12 @@ def search_product(keyword):
                 sales_realtime = row.get("Sales_Realtime", None)
                 current_stock = row.get("มี Stock อยู่ที่", None)
 
-                # แก้ None เป็น 0
                 receipts = [r if r is not None else 0 for r in receipts]
                 dc = [d if d is not None else 0 for d in dc]
                 invs = [v if v is not None else 0 for v in invs]
                 eoys = [s if s is not None else 0 for s in eoys]
                 sales = [s if s is not None else 0 for s in sales]
 
-                # เรียงวันที่ใหม่สุด → เก่าสุด
                 sorted_indexes = sorted(
                     range(len(dates)),
                     key=lambda i: datetime.strptime(dates[i], "%Y-%m-%d"),
@@ -468,67 +466,51 @@ def search_product(keyword):
                 )
 
                 def short_dayname(dt):
-                    day_map = {
+                    return {
                         "Mon": "M", "Tue": "Tu", "Wed": "W", "Thu": "Th", 
-                        "Fri": "Fr", "Sat": "Sa", "Sun": "Su",
-                    }
-                    return day_map.get(dt.strftime("%a"), "?")
-
+                        "Fri": "Fr", "Sat": "Sa", "Sun": "Su"
+                    }.get(dt.strftime("%a"), "?")
+                
                 lines = ["Date    | Sales | Rec  | Adj  | SOH"]
-                
-                # เพิ่มข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก (ถ้ามี)
-                if sales_realtime is not None or row.get("GOR_Received") is not None:
-                    try:
-                        sales_realtime_raw = str(sales_realtime).replace(",", "").strip() if sales_realtime is not None else "0"
-                        realtime_sales = float(sales_realtime_raw)
-                        
-                        current_stock_raw = str(current_stock).replace(",", "").replace("~", "").strip() if current_stock is not None else "0"
-                        realtime_stock = float(current_stock_raw)   
+                try:
+                    sales_realtime_value = float(str(sales_realtime).replace(",", "").strip()) if sales_realtime else 0
+                    stock_value = float(str(current_stock).replace(",", "").replace("~", "").strip()) if current_stock else 0
 
-                        gor_rec = float(row.get("GOR_Received", 0) or 0)
-                        
-                        # สร้างวันที่วันนี้
-                        today = datetime.now()
-                        today_day = short_dayname(today)
-                        today_date = f"{today_day} {today.day}/{today.month}"
-                        
-                        realtime_line = (
-                            f"{today_date.ljust(8)}| "
-                            f"{str(int(round(realtime_sales))).rjust(5)} | "
-                            f"{str(0).rjust(5)} | "
-                            f"{str(0).rjust(5)} | "
-                            f"{str(int(round(realtime_stock))).rjust(4)}"
-                        )
-                        lines.append(realtime_line)
-                    except Exception as e:
-                        print(f"Error processing Sales_Realtime data: {e}")
-                
-                for i in sorted_indexes:
+                    raw_gor = row.get("GOR_Received")
+                    if isinstance(raw_gor, list):
+                        gor_value = float(raw_gor[0]) if raw_gor else 0
+                    elif isinstance(raw_gor, str):
+                        gor_value = float(raw_gor.strip().replace(",", "") or 0)
+                    elif isinstance(raw_gor, (int, float)):
+                        gor_value = float(raw_gor)
+                    else:
+                        gor_value = 0
+
+                    today = datetime.now()
+                    today_day = short_dayname(today)
+                    today_date = f"{today_day} {today.day}/{today.month}"
+
+                    line_today = (
+                        f"{today_date.ljust(8)}| "
+                        f"{str(int(round(sales_realtime_value))).rjust(5)} | "
+                        f"{str(int(round(gor_value))).rjust(5)} | "
+                        f"{str(0).rjust(5)} | "
+                        f"{str(int(round(stock_value))).rjust(4)}"
+                    )
+                    lines.append(line_today)
+                    print("✅ เพิ่มบรรทัดวันนี้:", line_today)
+                except Exception as e:
+                    print("❌ Error generating today's line:", str(e))
+                    print("🔍 GOR_Received raw:", row.get("GOR_Received"))
+
+                for i in sorted_indexes[:7]:
                     try:
                         d = datetime.strptime(dates[i], "%Y-%m-%d")
-                        day = short_dayname(d)
-                        short_date = f"{day} {d.day}/{d.month}"
+                        short_date = f"{short_dayname(d)} {d.day}/{d.month}"
                     except:
                         short_date = dates[i]
 
-                    if i == 0 and row.get("GOR_Received")is not None:
-                        rec_total = float(row["GOR_Received"])
-                    else:                      
-                        rec_total = receipts[i] + dc[i]
-
-                    raw_gor = row.get("GOR_Received")
-
-                    print("🔍 GOR_Received raw:", raw_gor)
-
-                    if isinstance(raw_gor, list):
-                        gor_rec = float(raw_gor[0]) if raw_gor else 0
-                    elif isinstance(raw_gor, str):
-                        gor_rec = float(raw_gor.strip().replace(",", ""))
-                    elif isinstance(raw_gor, (int, float)):
-                        gor_rec = float(raw_gor)
-                    else:
-                        gor_rec = 0
-
+                    rec_total = receipts[i] + dc[i]
                     line = (
                         f"{short_date.ljust(8)}| "
                         f"{str(int(round(sales[i]))).rjust(5)} | "
@@ -539,17 +521,16 @@ def search_product(keyword):
                     lines.append(line)
 
                 header = (
-                    f"ไอเท็ม: {item_id} | Dept: {depts[0]} | Class: {classes[0]}\n"
+                    f"ไอเท็ม: {item_id} | Dept: {depts[0] if depts else '-'} | Class: {classes[0] if classes else '-'}\n"
                     f"สินค้า: {row.get('สินค้า', '')}"
                 )
 
                 print("📦 lines ที่จะส่งเข้า Flex Message:")
                 for l in lines:
                     print("➡️", l)
-                
-                # ส่งกลับเป็น Flex Message สำหรับรายละเอียดสินค้า
-                return create_item_detail_flex(header, lines)
 
+                return create_item_detail_flex(header, lines)
+            
         return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
 
     # ค้นหาสินค้าปกติ - ส่งกลับเป็น Flex Message
