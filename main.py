@@ -516,6 +516,18 @@ def search_product(keyword):
                     else:                      
                         rec_total = receipts[i] + dc[i]
 
+                    raw_gor = row.get("GOR_Received")
+
+                    if isinstance(raw_gor, list):
+                        gor_rec = float(raw_gor[0]) if raw_gor else 0
+                    elif isinstance(raw_gor, (int, float, str)):
+                        try:
+                            gor_rec = float(raw_gor)
+                        except:
+                            gor_rec = 0
+                    else:
+                        gor_rec = 0
+
                     line = (
                         f"{short_date.ljust(8)}| "
                         f"{str(int(round(sales[i]))).rjust(5)} | "
