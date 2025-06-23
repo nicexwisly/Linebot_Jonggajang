@@ -520,11 +520,10 @@ def search_product(keyword):
 
                     if isinstance(raw_gor, list):
                         gor_rec = float(raw_gor[0]) if raw_gor else 0
-                    elif isinstance(raw_gor, (int, float, str)):
-                        try:
-                            gor_rec = float(raw_gor)
-                        except:
-                            gor_rec = 0
+                    elif isinstance(raw_gor, str):
+                        gor_rec = float(raw_gor.strip().replace(",", ""))
+                    elif isinstance(raw_gor, (int, float)):
+                        gor_rec = float(raw_gor)
                     else:
                         gor_rec = 0
 
