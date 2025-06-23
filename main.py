@@ -518,6 +518,8 @@ def search_product(keyword):
 
                     raw_gor = row.get("GOR_Received")
 
+                    print("🔍 GOR_Received raw:", raw_gor)
+
                     if isinstance(raw_gor, list):
                         gor_rec = float(raw_gor[0]) if raw_gor else 0
                     elif isinstance(raw_gor, str):
