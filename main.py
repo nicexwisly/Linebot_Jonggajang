@@ -33,7 +33,7 @@ def reply_to_line(reply_token, message_data):
     r = requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=body)
     return r
 
-def create_product_search_flex(results, keyword):
+#def create_product_search_flex(results, keyword):
     """สร้าง Flex Message สำหรับแสดงผลการค้นหาสินค้า - ดีไซน์ใหม่"""
     
     # ปรับแปลง keyword ให้แสดงใน header
