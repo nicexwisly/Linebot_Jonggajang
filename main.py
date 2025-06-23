@@ -542,6 +542,10 @@ def search_product(keyword):
                     f"ไอเท็ม: {item_id} | Dept: {depts[0]} | Class: {classes[0]}\n"
                     f"สินค้า: {row.get('สินค้า', '')}"
                 )
+
+                print("📦 lines ที่จะส่งเข้า Flex Message:")
+                for l in lines:
+                    print("➡️", l)
                 
                 # ส่งกลับเป็น Flex Message สำหรับรายละเอียดสินค้า
                 return create_item_detail_flex(header, lines)
