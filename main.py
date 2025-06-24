@@ -231,7 +231,7 @@ def search_product(keyword):
     # ตรวจสอบคำสั่ง mm สำหรับรายละเอียดสินค้า
     if keyword.startswith("mm"):
         item_id = keyword.replace("mm", "").strip()
-
+        
         for row in json_data:
             if str(row.get("ไอเท็ม", "")) == item_id:
                 dates = row.get("date", [])
@@ -245,12 +245,14 @@ def search_product(keyword):
                 sales_realtime = row.get("Sales_Realtime", None)
                 current_stock = row.get("มี Stock อยู่ที่", None)
 
+                # แก้ None เป็น 0
                 receipts = [r if r is not None else 0 for r in receipts]
                 dc = [d if d is not None else 0 for d in dc]
                 invs = [v if v is not None else 0 for v in invs]
                 eoys = [s if s is not None else 0 for s in eoys]
                 sales = [s if s is not None else 0 for s in sales]
 
+                # เรียงวันที่ใหม่สุด → เก่าสุด
                 sorted_indexes = sorted(
                     range(len(dates)),
                     key=lambda i: datetime.strptime(dates[i], "%Y-%m-%d"),
@@ -258,12 +260,14 @@ def search_product(keyword):
                 )
 
                 def short_dayname(dt):
-                    return {
+                    day_map = {
                         "Mon": "M", "Tue": "Tu", "Wed": "W", "Thu": "Th", 
-                        "Fri": "Fr", "Sat": "Sa", "Sun": "Su"
+                        "Fri": "Fr", "Sat": "Sa", "Sun": "Su",
                     }.get(dt.strftime("%a"), "?")
-                
+
                 lines = ["Date    | Sales | Rec  | Adj  | SOH"]
+                
+                # เพิ่มข้อมูลจาก Sales_Realtime เป็นบรรทัดแรก (ถ้ามี)
                 try:
                     sales_realtime_value = float(str(sales_realtime).replace(",", "").strip()) if sales_realtime else 0
                     stock_value = float(str(current_stock).replace(",", "").replace("~", "").strip()) if current_stock else 0
@@ -323,40 +327,92 @@ def search_product(keyword):
 
                 return create_item_detail_flex(header, lines)
             
-        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"
+        return f"❌ ไม่พบข้อมูลไอเท็ม '{item_id}'"                                        
+
+    # ค้นหาสินค้าปกติ - ส่งกลับเป็นข้อความธรรมดา
+    for row in json_data:
+        name = row.get("สินค้า", "").lower().replace(" ", "")
+        item_id = str(row.get("ไอเท็ม", "")).split(".")[0]
+        plu = str(row.get("PLU", "")).strip()
+        barcodes = []
+        raw_barcode = row.get("Barcode", [])
+        if raw_barcode is None:
+            barcodes = []
+        elif isinstance(raw_barcode, str):
+            barcodes = [raw_barcode.strip()]
+        else:
+            barcodes = raw_barcode
+        stock_raw = row.get("มี Stock อยู่ที่", "").replace("~", "").strip()
+
+        try:
+            stock = float(stock_raw)
+        except ValueError:
+            continue
+
+        if is_plu_search:
+            if search_value == plu:
+                results.append(row)
+        else:
+            if (
+                search_value in name    
+                or search_value == item_id
+                or search_value in barcodes
+            ):
+                results.append(row)
+                
+    if not results:
+        return f"❌ ไม่พบสินค้า '{keyword}' กรุณาลองใหม่อีกครั้ง"
+    
+    # เรียงตาม Stock จากมากไปน้อย
+    results = sorted(results, key=lambda r: float(str(r.get("มี Stock อยู่ที่", "0")).replace("~", "").strip()), reverse=True)
+
+    # จำกัดจำนวนผลลัพธ์
+    max_results = 10
+    if len(results) > max_results:
+        results = results[:max_results]
+    
+    # สร้างข้อความธรรมดา
+    response_text = f"🔍 พบสินค้า {len(results)} รายการ:\n\n"
+    
+    for i, product in enumerate(results, 1):
+        item_id = product.get('ไอเท็ม', '')
+        plu = product.get('PLU', 'ไม่พบ')
+        name = product.get('สินค้า', '')
+        price = product.get('ราคา', '')
+        stock = product.get('มี Stock อยู่ที่', '')
+        on_order = product.get('On Order', '')
+        
+        # แสดงชื่อสินค้า (จำกัดความยาว)
+        display_name = name[:40] + "..." if len(name) > 40 else name
+        
+        # กำหนดไอคอนสำหรับ stock
+        stock_value = float(str(stock).replace("~", "").strip() or "0")
+        stock_icon = "❌" if stock_value <= 0 else "✅"
+        
+        response_text += f"{i}. {display_name}\n"
+        response_text += f"   ไอเท็ม: {item_id} | PLU: {plu}\n"
+        response_text += f"   ราคา: {price} บาท\n"
+        response_text += f"   {stock_icon} คงเหลือ: {stock} ชิ้น | On Order: {on_order}\n\n"
+    
+    return response_text
 
 @app.route("/callback", methods=["POST"])
 def callback():
     body = request.json
     try:
-        print("Received webhook:", body)  # Add logging
         events = body.get("events", [])
         for event in events:
-            reply_token = event["replyToken"]
-            
-            # Handle text messages
             if event.get("type") == "message" and event["message"]["type"] == "text":
                 user_msg = event["message"]["text"]
-                print(f"Received message: {user_msg}")  # Add logging
+                reply_token = event["replyToken"]
 
                 if user_msg.startswith("@@"):
                     keyword = user_msg.replace("@@", "").strip()
-                    print(f"Searching for keyword: {keyword}")  # Add logging
                     answer = search_product(keyword)
-                    print(f"Search result: {answer}")  # Add logging
                     reply_to_line(reply_token, answer)
                 else:
                     # ถ้าไม่ใช่ @@ → ไม่ตอบกลับ
                     return "", 200
-                    
-            # Handle postback events (from button clicks)
-            elif event.get("type") == "postback":
-                postback_data = event["postback"]["data"]
-                
-                if postback_data.startswith("@@"):
-                    keyword = postback_data.replace("@@", "").strip()
-                    answer = search_product(keyword)
-                    reply_to_line(reply_token, answer)
 
         return jsonify({"status": "ok"}), 200
     except Exception as e:
